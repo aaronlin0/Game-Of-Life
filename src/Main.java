@@ -1,17 +1,44 @@
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        Menu menu = new Menu();
+        Display display = new Display();
+        Life life = new Life();
+        int config = menu.getConfig();
+        int[] editGrid;
 
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+        if (config == 1) {
+            display = new Display();
+        } else if (config == 2) {
+            display = new Display(menu.getRows(), menu.getColumns(), menu.getGridChar(), menu.getLifeChar(),
+                    menu.getGridColor(), menu.getLifeColor(), menu.getCoordColor());
+        }
+        display.gridInitialFill();
 
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
+        while (true) {
+            display.gridPrintWithCoord();
+            editGrid = life.lifeCoordinatesAppend(display.getRows(), display.getColumns());
+            if (editGrid[0] == -1) {
+                break;
+            }
+            if (editGrid[0] == 0) {
+                int lastRow = Integer.parseInt(life.getCoordinate(life.getLifeCoords().split(";").length - 1, true));
+                int lastColumn = Integer
+                        .parseInt(life.getCoordinate(life.getLifeCoords().split(";").length - 1, false));
+                display.gridUpdate(lastRow - 1, lastColumn - 1, "add");
+            }
+            if (editGrid.length == 2) {
+                display.gridUpdate(editGrid[0] - 1, editGrid[1] - 1, "del");
+            }
+        }
+
+        while (true) {
+            display.gridPrint();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            display.evolve();
         }
     }
 }
